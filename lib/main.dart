@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasky/core/on_boarding_screen/onboarding_screen.dart';
 import 'package:tasky/features/auth/presintation/screens/home_screen.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: HomeScreen(),
+      home: OnboardingScreen(),
     );
   }
 }
