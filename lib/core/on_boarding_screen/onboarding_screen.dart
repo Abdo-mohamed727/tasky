@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tasky/core/theme/colors/my_colors.dart';
-import 'package:tasky/features/auth/presintation/screens/home_screen.dart';
+import 'package:tasky/features/auth/presintation/screens/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -105,7 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     if (currentPage == onboardingData.length - 1) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     } else {
                       _controller.nextPage(
