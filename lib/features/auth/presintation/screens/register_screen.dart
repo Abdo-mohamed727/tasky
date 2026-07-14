@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tasky/core/route/app-routs.dart';
 import 'package:tasky/core/widgets/coustom_text_form_field.dart';
+import 'package:tasky/features/auth/presintation/cubit/sign_up/cubit/sign_up_cubit.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -10,24 +13,13 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
-  void dispose() {
-    _usernameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final cubit = context.read<SignUpCubit>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -63,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 CoustomTextFormField(
                   hintText: 'enter username...',
-                  controller: _usernameController,
+                  controller: cubit.nameController,
                   keyboardType: TextInputType.text,
                   obscureText: false,
                   suffixIcon: Icons.person_outline,
@@ -88,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 CoustomTextFormField(
                   hintText: 'enter username...',
-                  controller: _emailController,
+                  controller: cubit.emailController,
                   keyboardType: TextInputType.emailAddress,
                   obscureText: false,
                   suffixIcon: Icons.email_outlined,
@@ -113,7 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 CoustomTextFormField(
                   hintText: 'Password...',
-                  controller: _passwordController,
+                  controller: cubit.passwordController,
                   keyboardType: TextInputType.visiblePassword,
                   obscureText: _obscurePassword,
                   suffixIcon: _obscurePassword
@@ -132,68 +124,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-
-                // ── Confirm Password ──
-                const Text(
-                  'Confirm Password',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF555555),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                CoustomTextFormField(
-                  hintText: 'Password...',
-                  controller: _confirmPasswordController,
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: _obscureConfirmPassword,
-                  suffixIcon: _obscureConfirmPassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  onSuffixIconTap: () {
-                    setState(
-                        () => _obscureConfirmPassword = !_obscureConfirmPassword);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
                 const SizedBox(height: 40),
 
                 // ── Register Button ──
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // TODO: trigger register cubit
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5C35E8),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                BlocConsumer<SignUpCubit, SignUpState>(
+                  listener: (context, state) {
+                    if (state is SignUpSuccess) {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRouts.homeScreen,
+                      );
+                    }
+                    if (state is SignUpError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.errorMessage),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  buildWhen: (previous, current) => current is SignUpSuccess || current is SignUpError || current is SignUpLoading,
+                  builder: (context, state) {
+                   
+                    if(state is SignUpLoading){
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            cubit.signUp(
+                              name: cubit.nameController.text,
+                              email: cubit.emailController.text,
+                              password: cubit.passwordController.text,
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5C35E8),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Register',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 40),
 
@@ -203,14 +192,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     const Text(
                       'Already have an account? ',
-                      style: TextStyle(
-                        color: Color(0xFF888888),
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Color(0xFF888888), fontSize: 14),
                     ),
                     GestureDetector(
                       onTap: () {
-                        // TODO: navigate to login
+                        Navigator.pushNamed(
+                          context,
+                          AppRouts.loginScreen,
+                        );
                       },
                       child: const Text(
                         'Login',

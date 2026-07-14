@@ -1,4 +1,4 @@
-import 'package:tasky/features/auth/domain/auth_repo/login_repo.dart';
+import 'package:tasky/features/auth/domain/auth_repo/auth_repo.dart';
 
 class LoginUseCase {
   final LoginRepo loginRepo;

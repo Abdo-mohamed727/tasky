@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasky/core/di/dependency_ingectiojn.dart';
+import 'package:tasky/core/route/app-routs.dart';
 import 'package:tasky/core/widgets/coustom_text_form_field.dart';
 import 'package:tasky/features/auth/presintation/cubit/login/login_cubit.dart';
 import 'package:tasky/features/auth/presintation/widgets/login_button.dart';
@@ -121,7 +122,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Color(0xFF888888), fontSize: 14),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRouts.registerScreen,
+                        );
+                      },
                       child: const Text(
                         'Register',
                         style: TextStyle(
